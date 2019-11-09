@@ -23,10 +23,6 @@ Stability: `<%= schemata['stability'] %>`
 
 ### Attributes
 
-<details>
-  <summary>Details</summary>
-
-
 | Name | Type | Description | Example |
 | ------- | ------- | ------- | ------- |
 <%- refs = extract_schemata_refs(schema, schemata['properties']).map {|v| v && v.split("/")} %>
@@ -39,7 +35,6 @@ Stability: `<%= schemata['stability'] %>`
 | **<%= name %>** | *<%= type %>* | <%= description %> | <%= example %> |
 <%- end %>
 
-</details>
 
 <%- end %>
 <%- (schemata['links'] || []).each do |link, datum| %>

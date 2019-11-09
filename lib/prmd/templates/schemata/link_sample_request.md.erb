@@ -1,0 +1,46 @@
+<%-
+    data = nil
+    path = path.gsub(/{([^}]*)}/) {|match| '$' + match.gsub(/[{}]/, '').upcase}
+    get_params = []
+
+    if link.has_key?('schema')
+      data = schema.schema_example(link['schema'])
+
+      if link['method'].upcase == 'GET' && !data.nil?
+        get_params << Prmd::UrlGenerator.new({schema: schema, link: link, options: options}).url_params
+      end
+    end
+    if link['method'].upcase != 'GET'
+      options = options.dup
+      options[:http_header] = { 'Content-Type' => options[:content_type] }.merge(options[:http_header])
+    end
+  %>
+
+#### Curl Example
+
+```bash
+  curl -X <%= link['method'].upcase %> <%= schema.href %><%= path -%> \
+   <% unless options[:skip_auth] %>
+   -H "Authorization: Bearer USER_API_AUTH_TOKEN" \
+   <% end %>
+   <%- if !data.nil? && link['method'].upcase != 'GET' %>
+   <% data.each_with_index do |(k, v), i| %>
+   -d '<%=k%>=<%= v %>' <%= ' ' %>
+   <% end %>
+   <%- elsif !get_params.empty? && link['method'].upcase == 'GET' %> -G \
+   -d <%= get_params.join(" \\\n  -d ") %>
+  <%- end %>
+```
+
+#### JS Fetch
+
+```js
+fetch( "<%= schema.href %><%= path -%>", {
+   method: '<%= link['method'].upcase %>',
+   headers: {
+     "content-type":"application/x-www-form-urlencoded"<% unless options[:skip_auth] %>,
+     "Authorization":"Bearer USER_API_AUTH_TOKEN"<% end %>
+    },
+    body: "<%= (data || get_params || []).map do |k,v| "#{k}=#{v}" end.join('&') %>"
+    })
+```
