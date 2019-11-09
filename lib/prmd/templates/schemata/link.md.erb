@@ -29,12 +29,13 @@
   <%- end %>
 <%- end %>
 
-#### Curl Example
+#### Request Examples
 
 <%=
   curl_options = options.dup
   http_header = link['http_header'] || {}
   curl_options[:http_header] = curl_options[:http_header].merge(http_header)
+
   Prmd::Template.render('schemata/link_sample_request.md.erb', File.dirname(options[:template]), {
     options:         curl_options,
     resource:        resource,
